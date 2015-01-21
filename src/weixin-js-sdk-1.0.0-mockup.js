@@ -11,10 +11,10 @@ function wrap(the_global, initialize) {
 // a => the_global
 // b => initialize
 !wrap(this, function(a, b) {
-    function c(b, c, d) {
-        a.WeixinJSBridge ? WeixinJSBridge.invoke(b, e(c), function(a) {
-            h(b, a, d)
-        }) : k(b, d)
+    function c(api_name, conf, conf_of_callback) {
+        a.WeixinJSBridge ? WeixinJSBridge.invoke(api_name, e(conf), function(result) {
+            h(api_name, result, conf_of_callback)
+        }) : k(api_name, conf_of_callback)
     }
 
     function d(b, c, d) {
@@ -23,8 +23,17 @@ function wrap(the_global, initialize) {
         }) : d ? k(b, d) : k(b, c)
     }
 
-    function e(a) {
-        return a = a || {}, a.appId = A.appId, a.verifyAppId = A.appId, a.verifySignType = "sha1", a.verifyTimestamp = A.timestamp + "", a.verifyNonceStr = A.nonceStr, a.verifySignature = A.signature, a
+    function e (conf) {
+        conf = conf || {};
+
+        conf.appId = A.appId;
+        conf.verifyAppId = A.appId;
+        conf.verifySignType = "sha1";
+        conf.verifyTimestamp = A.timestamp + "",
+        conf.verifyNonceStr = A.nonceStr,
+        conf.verifySignature = A.signature
+
+        return conf
     }
 
     function f(a, b) {
@@ -47,11 +56,40 @@ function wrap(the_global, initialize) {
         }
     }
 
+    // api_name, result, conf_of_callback
     function h(a, b, c) {
-        var d, e, f;
-        switch (delete b.err_code, delete b.err_desc, delete b.err_detail, d = b.errMsg, d || (d = b.err_msg, delete b.err_msg, d = i(a, d, c), b.errMsg = d), c = c || {}, c._complete && (c._complete(b), delete c._complete), d = b.errMsg || "", A.debug && !c.isInnerInvoke && alert(JSON.stringify(b)), e = d.indexOf(":"), f = d.substring(e + 1)) {
+        delete b.err_code;
+        delete b.err_desc;
+        delete b.err_detail;
+
+        var d = b.errMsg
+        if (!d) {
+            d = b.err_msg;
+            delete b.err_msg;
+            d = i(a, d, c);
+            b.errMsg = d;
+        }
+
+        c = c || {};
+        if (c._complete) {
+            c._complete(b);
+            delete c._complete;
+        }
+
+        d = b.errMsg || "";
+
+        if (A.debug && !c.isInnerInvoke) {
+            alert(JSON.stringify(b));
+        }
+
+        var e = d.indexOf(":");
+        var f = d.substring(e + 1);
+
+        switch (f) {
             case "ok":
-                c.success && c.success(b);
+                if (c.success) {
+                    c.success(b);
+                }
                 break;
             case "cancel":
                 c.cancel && c.cancel(b);
@@ -59,7 +97,10 @@ function wrap(the_global, initialize) {
             default:
                 c.fail && c.fail(b)
         }
-        c.complete && c.complete(b)
+
+        if (c.complete) {
+            c.complete(b)
+        }
     }
 
     function i(a, b) {
@@ -169,30 +210,39 @@ function wrap(the_global, initialize) {
     }, n(function() {
         y.initEndTime = m()
     }), D = {
-        config: function(a) {
-            A = a, k("config", a), n(function() {
-                c(p.config, {
-                    verifyJsApiList: j(A.jsApiList)
-                }, function() {
-                    B._complete = function(a) {
-                        y.preVerifyEndTime = m(), C.state = 1, C.res = a
-                    }, B.success = function() {
-                        z.isPreVerifyOk = 0
-                    }, B.fail = function(a) {
-                        B._fail ? B._fail(a) : C.state = -1
-                    };
-                    var a = B._completes;
-                    return a.push(function() {
-                        A.debug || l()
-                    }), B.complete = function(b) {
-                        for (var c = 0, d = a.length; d > c; ++c) a[c](b);
-                        B._completes = []
-                    }, B
-                }()), y.preVerifyStartTime = m()
-            }), A.beta && o()
+        config: function (a) {
+            // A = a, k("config", a), n(function() {
+            //     c(p.config, {
+            //         verifyJsApiList: j(A.jsApiList)
+            //     }, function() {
+            //         B._complete = function(a) {
+            //             y.preVerifyEndTime = m(), C.state = 1, C.res = a
+            //         },
+            //         B.success = function() {
+            //             z.isPreVerifyOk = 0
+            //         },
+            //         B.fail = function(a) {
+            //             B._fail ? B._fail(a) : C.state = -1
+            //         };
+            //         var a = B._completes;
+            //         return a.push(function() {
+            //             A.debug || l()
+            //         }), B.complete = function(b) {
+            //             for (var c = 0, d = a.length; d > c; ++c) a[c](b);
+            //             B._completes = []
+            //         }, B
+            //     }()), y.preVerifyStartTime = m()
+            // }), A.beta && o()
+
+            // ** mockup
+            // pass
         },
-        ready: function(a) {
-            0 != C.state ? a() : (B._completes.push(a), !u && A.debug && a())
+
+        ready: function (callback) {
+            // 0 != C.state ? callback() : (B._completes.push(callback), !u && A.debug && callback())
+
+            // ** mockup
+            setTimeout(callback, 3000);
         },
         error: function(a) {
             "6.0.2" > x || (-1 == C.state ? a(C.res) : B._fail = a)
@@ -408,12 +458,12 @@ function wrap(the_global, initialize) {
         showAllNonBaseMenuItem: function(a) {
             c("showAllNonBaseMenuItem", {}, a)
         },
-        scanQRCode: function(a) {
+        scanQRCode: function(conf) {
             c("scanQRCode", {
-                desc: a.desc,
-                needResult: a.needResult || 0,
-                scanType: a.scanType || ["qrCode", "barCode"]
-            }, a)
+                desc: conf.desc,
+                needResult: conf.needResult || 0,
+                scanType: conf.scanType || ["qrCode", "barCode"]
+            }, conf)
         },
         openProductSpecificView: function(a) {
             c(p.openProductSpecificView, {

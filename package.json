@@ -23,7 +23,6 @@
   "homepage": "https://github.com/shuaishuai/weixin-js-debug",
   "devDependencies": {
     "browserify": "^8.1.1",
-    "gulp": "^3.8.10",
-    "gulp-rename": "^1.2.0"
+    "gulp": "^3.8.10"
   }
 }
