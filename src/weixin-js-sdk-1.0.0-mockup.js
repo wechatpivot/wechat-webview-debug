@@ -57,29 +57,29 @@ function wrap(the_global, initialize) {
     }
 
     // api_name, result, conf_of_callback
-    function h(a, b, c) {
-        delete b.err_code;
-        delete b.err_desc;
-        delete b.err_detail;
+    function h(a, bridge_result, c) {
+        delete bridge_result.err_code;
+        delete bridge_result.err_desc;
+        delete bridge_result.err_detail;
 
-        var d = b.errMsg
+        var d = bridge_result.errMsg
         if (!d) {
-            d = b.err_msg;
-            delete b.err_msg;
+            d = bridge_result.err_msg;
+            delete bridge_result.err_msg;
             d = i(a, d, c);
-            b.errMsg = d;
+            bridge_result.errMsg = d;
         }
 
         c = c || {};
         if (c._complete) {
-            c._complete(b);
+            c._complete(bridge_result);
             delete c._complete;
         }
 
-        d = b.errMsg || "";
+        d = bridge_result.errMsg || "";
 
         if (A.debug && !c.isInnerInvoke) {
-            alert(JSON.stringify(b));
+            alert(JSON.stringify(bridge_result));
         }
 
         var e = d.indexOf(":");
@@ -88,25 +88,28 @@ function wrap(the_global, initialize) {
         switch (f) {
             case "ok":
                 if (c.success) {
-                    c.success(b);
+                    c.success(bridge_result);
                 }
                 break;
             case "cancel":
-                c.cancel && c.cancel(b);
+                c.cancel && c.cancel(bridge_result);
                 break;
             default:
-                c.fail && c.fail(b)
+                c.fail && c.fail(bridge_result)
         }
 
         if (c.complete) {
-            c.complete(b)
+            c.complete(bridge_result)
         }
     }
 
-    function i(a, b) {
-        var d, e, f, g;
-        if (b) {
-            switch (d = b.indexOf(":"), a) {
+    function i(api_name, err_msg) {
+        var e;
+
+        if (err_msg) {
+            var idx = err_msg.indexOf(':');
+
+            switch (api_name) {
                 case p.config:
                     e = "config";
                     break;
@@ -114,13 +117,57 @@ function wrap(the_global, initialize) {
                     e = "openProductSpecificView";
                     break;
                 default:
-                    e = b.substring(0, d), e = e.replace(/_/g, " "), e = e.replace(/\b\w+\b/g, function(a) {
-                        return a.substring(0, 1).toUpperCase() + a.substring(1)
-                    }), e = e.substring(0, 1).toLowerCase() + e.substring(1), e = e.replace(/ /g, ""), -1 != e.indexOf("Wcpay") && (e = e.replace("Wcpay", "WCPay")), f = q[e], f && (e = f)
+                    e = err_msg.substring(0, idx);
+                    e = e.replace(/_/g, " ");
+                    // \b  word boundary
+                    // http://blog.csdn.net/lxcnn/article/details/4355364
+                    // CamelCase
+                    // http://en.wikipedia.org/wiki/CamelCase
+                    e = e.replace(/\b\w+\b/g, function (a) {
+                        return a.substring(0, 1).toUpperCase() + a.substring(1);
+                    });
+                    e = e.substring(0, 1).toLowerCase() + e.substring(1);
+                    e = e.replace(/ /g, "");
+
+                    if (e.indexOf('Wcpay') !== -1) {
+                        e = e.replace('Wcpay', 'WCPay');
+                    }
+
+                    var f = q[e];
+                    if (f) {
+                        e = f;
+                    }
             }
-            g = b.substring(d + 1), "confirm" == g && (g = "ok"), -1 != g.indexOf("failed_") && (g = g.substring(7)), -1 != g.indexOf("fail_") && (g = g.substring(5)), g = g.replace(/_/g, " "), g = g.toLowerCase(), ("access denied" == g || "no permission to execute" == g) && (g = "permission denied"), "config" == e && "function not exist" == g && (g = "ok"), b = e + ":" + g
+
+            var g = err_msg.substring(idx + 1);
+
+            if (g === 'confirm') {
+                g = 'ok';
+            }
+
+            if (g.indexOf('failed_') !== -1) {
+                g = g.substring(7);
+            }
+
+            if (g.indexOf('fail_') !== -1) {
+                g = g.substring(5);
+            }
+
+            g = g.replace(/_/g, " ");
+            g = g.toLowerCase();
+
+            if (g === 'access denied' || g === 'no permission to execute') {
+                g = 'permission denied';
+            }
+
+            if (e === 'config' && g === 'function not exist') {
+                g = 'ok';
+            }
+
+            err_msg = e + ":" + g
         }
-        return b
+
+        return err_msg;
     }
 
     function j(a) {
@@ -242,7 +289,11 @@ function wrap(the_global, initialize) {
             // 0 != C.state ? callback() : (B._completes.push(callback), !u && A.debug && callback())
 
             // ** mockup
-            setTimeout(callback, 3000);
+            setTimeout(function () {
+                callback({
+                    errMsg: 'config:ok'
+                });
+            }, 2000);
         },
         error: function(a) {
             "6.0.2" > x || (-1 == C.state ? a(C.res) : B._fail = a)
@@ -458,6 +509,7 @@ function wrap(the_global, initialize) {
         showAllNonBaseMenuItem: function(a) {
             c("showAllNonBaseMenuItem", {}, a)
         },
+
         scanQRCode: function(conf) {
             c("scanQRCode", {
                 desc: conf.desc,
@@ -465,6 +517,7 @@ function wrap(the_global, initialize) {
                 scanType: conf.scanType || ["qrCode", "barCode"]
             }, conf)
         },
+
         openProductSpecificView: function(a) {
             c(p.openProductSpecificView, {
                 pid: a.productId,
