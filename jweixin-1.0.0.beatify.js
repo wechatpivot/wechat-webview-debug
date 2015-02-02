@@ -11,16 +11,29 @@ function wrap(the_global, initialize) {
 // a => the_global
 // b => initialize
 !wrap(this, function(a, b) {
+    // ** mapping to `invoke`
     function c(api_name, conf, conf_of_callback) {
         a.WeixinJSBridge ? WeixinJSBridge.invoke(api_name, e(conf), function(result) {
             h(api_name, result, conf_of_callback)
         }) : k(api_name, conf_of_callback)
     }
 
-    function d(b, c, d) {
-        a.WeixinJSBridge ? WeixinJSBridge.on(b, function(a) {
-            d && d.trigger && d.trigger(a), h(b, a, c)
-        }) : d ? k(b, d) : k(b, c)
+    // ** mapping to `on`
+    function d(api_name, conf_of_callback, fixme_another_conf) {
+        if (a.WeixinJSBridge) {
+            WeixinJSBridge.on(api_name, function (result) {
+                if (fixme_another_conf && fixme_another_conf.trigger) {
+                    fixme_another_conf.trigger(result);
+                }
+                h(api_name, result, conf_of_callback);
+            });
+        } else {
+            if (fixme_another_conf) {
+                k(api_name, fixme_another_conf);
+            } else {
+                k(api_name, conf_of_callback);
+            }
+        }
     }
 
     function e (conf) {
@@ -306,17 +319,17 @@ function wrap(the_global, initialize) {
                 }, a
             }())
         },
-        onMenuShareTimeline: function(a) {
+        onMenuShareTimeline: function(conf) {
             d(p.onMenuShareTimeline, {
                 complete: function() {
                     c("shareTimeline", {
-                        title: a.title || s,
-                        desc: a.title || s,
-                        img_url: a.imgUrl,
-                        link: a.link || location.href
-                    }, a)
+                        title: conf.title || s,  // ** document.title
+                        desc: conf.title || s,
+                        img_url: conf.imgUrl,
+                        link: conf.link || location.href
+                    }, conf)
                 }
-            }, a)
+            }, conf)
         },
         onMenuShareAppMessage: function(a) {
             d(p.onMenuShareAppMessage, {
