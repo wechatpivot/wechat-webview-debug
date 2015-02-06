@@ -49,13 +49,13 @@ function wrap(the_global, initialize) {
         return conf
     }
 
-    function f(a, b) {
+    function f(call_conf, scope) {
         return {
-            scope: b,
+            scope: scope,
             signType: "sha1",
-            timeStamp: a.timestamp + "",
-            nonceStr: a.nonceStr,
-            addrSign: a.addrSign
+            timeStamp: call_conf.timestamp + "",
+            nonceStr: call_conf.nonceStr,
+            addrSign: call_conf.addrSign
         }
     }
 
@@ -475,25 +475,33 @@ function wrap(the_global, initialize) {
                 }, a
             }())
         },
-        openLocation: function(a) {
+        openLocation: function (call_conf) {
             c("openLocation", {
-                latitude: a.latitude,
-                longitude: a.longitude,
-                name: a.name || "",
-                address: a.address || "",
-                scale: a.scale || 28,
-                infoUrl: a.infoUrl || ""
-            }, a)
+                latitude: call_conf.latitude,
+                longitude: call_conf.longitude,
+                name: call_conf.name || "",
+                address: call_conf.address || "",
+                scale: call_conf.scale || 28,
+                infoUrl: call_conf.infoUrl || ""
+            }, call_conf)
+
+            // ** mockup
+            alert('MOCKUP: 将用微信内置地图打开');
         },
-        getLocation: function(a) {
-            c(p.getLocation, function() {
-                var b = f(a, "jsapi_location");
-                return b.type = "wgs84", b
-            }(), function() {
-                return a._complete = function(a) {
-                    delete a.type
-                }, a
-            }())
+        getLocation: function (conf) {
+            c(p.getLocation,
+                function () {
+                    var b = f(conf, "jsapi_location");
+                    // http://en.wikipedia.org/wiki/World_Geodetic_System#A_new_World_Geodetic_System:_WGS_84
+                    b.type = "wgs84";
+                    return b;
+                }(),
+                function () {
+                    conf._complete = function (a) {
+                        delete a.type
+                    };
+                    return conf;
+                }());
         },
         hideOptionMenu: function(a) {
             c("hideOptionMenu", {}, a)
