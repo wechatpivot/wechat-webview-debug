@@ -261,8 +261,11 @@ function wrap(the_global, initialize) {
         x.initEndTime = l()
     }), C = {
         config: function(a) {
-            z = a, j("config", a), m(function() {
-                c(o.config, {
+            z = a, j("config", a);
+            var b = z.check === !1 ? !1 : !0;
+            m(function() {
+                var a, d, e;
+                if (b) c(o.config, {
                     verifyJsApiList: i(z.jsApiList)
                 }, function() {
                     A._complete = function(a) {
@@ -275,11 +278,15 @@ function wrap(the_global, initialize) {
                     var a = A._completes;
                     return a.push(function() {
                         z.debug || k()
-                    }), A.complete = function(b) {
-                        for (var c = 0, d = a.length; d > c; ++c) a[c](b);
+                    }), A.complete = function() {
+                        for (var c = 0, d = a.length; d > c; ++c) a[c]();
                         A._completes = []
                     }, A
-                }()), x.preVerifyStartTime = l()
+                }()), x.preVerifyStartTime = l();
+                else {
+                    for (B.state = 1, a = A._completes, d = 0, e = a.length; e > d; ++d) a[d]();
+                    A._completes = []
+                }
             }), z.beta && n()
         },
         ready: function(callback) {
