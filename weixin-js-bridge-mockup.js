@@ -12,7 +12,7 @@ var Bridge = {
       err_desc: 'WILL_DELETE',
       err_detail: 'WILL_DELETE',
 
-      err_msg: 'ok',
+      err_msg: api_name + ':ok',
     };
 
     var MOCKUP_RESULT = window.WEIXIN_JS_BRIDGE_INVOKE || {};
@@ -32,7 +32,9 @@ var Bridge = {
         },
       });
     } else {
-      result.resultStr = MOCKUP_RESULT[api_name] || '{}';
+      if (MOCKUP_RESULT[api_name]) {
+        result.resultStr = MOCKUP_RESULT[api_name];
+      }
     }
 
     callback(result);
