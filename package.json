@@ -4,7 +4,7 @@
   "description": "a mockup of WeixinJSBridge in the app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "uglify": "cat ./weixin-js-bridge-mockup.js | uglifyjs --screw-ie8 --stats --mangle --verbose --compress > ./weixin-js-bridge-mockup.min.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +20,8 @@
   "bugs": {
     "url": "https://github.com/hbrls/WeixinJSBridge-mockup/issues"
   },
-  "homepage": "https://github.com/hbrls/WeixinJSBridge-mockup"
+  "homepage": "https://github.com/hbrls/WeixinJSBridge-mockup",
+  "devDependencies": {
+    "uglify-js": "^2.5.0"
+  }
 }
