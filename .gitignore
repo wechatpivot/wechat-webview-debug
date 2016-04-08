@@ -1,1 +1,7 @@
+.DS_Store
+
 node_modules/
+
+src/weixin-js-bridge-mockup.min.js
+
+build/hook.js

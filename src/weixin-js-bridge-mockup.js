@@ -76,7 +76,7 @@ var Bridge = {
 };
 
 
-Bridge.lazyInvoke = function (api) {
+function lazyInvoke(api) {
   // ** from jweixin
   var API_NAMES = {
       config: "preVerifyJSAPI",
@@ -104,4 +104,34 @@ Bridge.lazyInvoke = function (api) {
 
 
 window.WeixinJSBridge = Bridge;
+
+
+var share = {};
+
+Object.defineProperty(share, 'moment', {
+  get: function () {
+    console.debug('分享到朋友圈');
+    lazyInvoke('onMenuShareTimeline');
+    return null;
+  },
+});
+
+Object.defineProperty(share, 'chat', {
+  get: function () {
+    console.debug('分享到聊天');
+    lazyInvoke('onMenuShareAppMessage');
+    return null;
+  },
+});
+
+
+
+var command = {
+  share: share,
+};
+
+
+var head = window.head || {};
+head.wechat = command;
+window.head = head;
 }());
