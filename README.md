@@ -1,4 +1,4 @@
-# WeixinJSBridge-mockup
+# WeChat WebView Debug
 
 模拟微信应用中打开网页时原生注入的 WeixinJSBridge 对象，方便在开发环境中调试
 

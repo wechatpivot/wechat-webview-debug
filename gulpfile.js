@@ -1,6 +1,5 @@
 var fs = require('fs');
 var gulp = require('gulp');
-var runSequence = require('run-sequence');
 var uglify =require('gulp-uglify');
 var rename =require('gulp-rename');
 var replace = require('gulp-replace');
@@ -23,9 +22,4 @@ gulp.task('hook', function () {
       .pipe(replace('{{ WeixinJSBridge }}', bridge))
       .pipe(gulp.dest('build/'));
   });
-});
-
-
-gulp.task('default', function () {
-  runSequence('bridge', 'hook');
 });
