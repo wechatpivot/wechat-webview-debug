@@ -1,10 +1,9 @@
 {
   "name": "wechat-webview-debug",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "a mockup of WeixinJSBridge in the app",
   "main": "index.js",
   "scripts": {
-    "build": "gulp bridge && gulp hook"
   },
   "repository": {
     "type": "git",
@@ -23,9 +22,6 @@
   },
   "homepage": "https://github.com/wechat-developer/wechat-webview-debug",
   "devDependencies": {
-    "gulp": "3.9.1",
-    "gulp-rename": "1.2.2",
-    "gulp-replace": "0.5.4",
-    "gulp-uglify": "2.0.1"
+    "gulp": "3.9.1"
   }
 }

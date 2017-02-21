@@ -17,6 +17,10 @@
     "https://*/*"
   ],
 
+  "web_accessible_resources": [
+    "js/*.js"
+  ],
+
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
